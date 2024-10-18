@@ -1,0 +1,3 @@
+tituloProduto,preco,descricao,imagemProduto,categoriaProduto,classProduto,exibirHome
+furadeira,400,Fura bem,/image,Ferramentas,Casa,True
+bomba,1500,Bomba combustível,/image,Auto,Carro,False
