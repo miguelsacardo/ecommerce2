@@ -13,6 +13,7 @@
 # x.imprimir()
 
 import sqlite3
+import pandas as pd
 
 class Ecommerce:
     def __init__(self, db='db.sqlite3'):
@@ -37,7 +38,7 @@ class Ecommerce:
 
                     self.create()
                 case(2):
-                    print("Read")
+                    self.read()
                 case(3):
                     print("Update")
                 case(4):
@@ -49,9 +50,69 @@ class Ecommerce:
 
     def create(self, tituloProduto, preco, descricao, imagemProduto, categoriaProduto, classProduto, exibirHome): #inserir dados no banco
         cursor = self.conn.cursor() #cursor é uma função da conexão, ele que vai executar os comandos do banco
+
+    def read(self):
+        print('\n'
+              '[1] - Listar todos os produtos\n'
+              '[2] - Listar por ID'
+              )
+        op = int(input("Escolha a opção: "))
+        match op:
+            case 1: #encontra todos os produtos da tabela e os retorna
+                df = pd.read_sql_query('SELECT * FROM api_produto', self.conn)
+                return print(df)
+            case 2:#enocntra os produtos que possuam um determinado ID
+                valor = int(input("ID: "))
+                query = f'SELECT * FROM api_produto WHERE id = {valor}'
+                df = pd.read_sql_query(query, self.conn)
+                return print(df)
+            case _:
+                print("Escolha uma opção válida...")
+
+    def update(self,  tituloProduto=None, preco=None, descricao=None, imagemProduto=None, categoriaProduto=None, classProduto=None, exibirHome=None):
+        #o None serve para que se o nome por exemplo não mudar, ele continuará o mesmo
+
+        cursor = self.conn.cursor()
+        campos = []
+        valores = []
         
+        if tituloProduto:
+            campos.append('tituloProduto = ?') #os valores que são diferentes mudarão
+            valores.append(tituloProduto)
+        
+        if preco:
+            campos.append('preco = ?')
+            valores.append(preco)
 
+        if descricao:
+            campos.append('descricao = ?')
+            valores.append(descricao)
 
+        if imagemProduto:
+            campos.append('imagemProduto = ?')
+            valores.append(imagemProduto)
+
+        if categoriaProduto:
+            campos.append('categoriaProduto = ?')
+            valores.append(categoriaProduto)
+
+        if classProduto:
+            campos.append('classProduto = ?')
+            valores.append(classProduto)
+
+        if exibirHome is not None: #o exibirHome vale true ou false. ENtão se o exibirHome nao for alterado então ele mantém
+            campos.append('exibirHome = ?')
+            valores.append(exibirHome)
+    
+        if campos: #se eu alterei os campos
+            valores.append(id) 
+            cursor.execute(
+                f'''UPDADE api_produto SET {', '.join(campos)} WHERE id = ?''', valores #as três aspas é porque pode ser que tenha mais de uma linha
+                )
+            self.conn.commit()
+            print("Produto atualizado com sucesso")
+        else:
+            print("Nenhum produto atualizado...")
 
 ecommerce = Ecommerce()
         
